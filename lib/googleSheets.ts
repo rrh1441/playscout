@@ -1,4 +1,4 @@
-// lib/googleSheets.ts (Corrected Field Mapping)
+// lib/googleSheets.ts (Fixed Field Mapping based on screenshot)
 import { google } from 'googleapis';
 import { Activity } from './types';
 
@@ -33,27 +33,33 @@ try {
 }
 const sheets = auth ? google.sheets({ version: 'v4', auth }) : null;
 
-// CORRECTED normalizeActivity function - Fixed field mapping to match your needs
+// FIXED normalizeActivity function - Based on your screenshot
 const normalizeActivity = (row: any[], rowIndex: number): Activity | null => {
-    if (!row || row.length < 2) return null;
+    if (!row || row.length < 3) return null;
     
-    // Map fields correctly based on your sheet structure
-    // Use column A as ID (index 0), use column B as name (index 1), etc.
+    // Based on your screenshot, it appears the columns are:
+    // Column A: ID (showing as "activity-0003")
+    // Column B: Date (showing as "4/13/2025")
+    // Column C: Title (showing as "Sunday Pony Rides at Marin Country Mart")
+    // Column D: Location (showing as "2257 Larkspur Landing Cir, Larkspur, CA 94939")
+    
     const id = row[0]?.toString().trim();
-    const name = row[1]?.toString().trim(); // This is the activity name/title
+    const activityDate = row[1]?.toString().trim();
+    const name = row[2]?.toString().trim(); // This should be the actual title
+    const location = row[3]?.toString().trim();
     
     if (!id || !name) return null;
     
     return { 
-        id: id,  // Column A (index 0) - ID
-        name: name, // Column B (index 1) - Name/Title
-        location: row[2]?.toString().trim() || 'Location TBD', // Column C (index 2) - Location
-        category: row[3]?.toString().trim() || 'General', // Column D (index 3) - Category
-        description: row[4]?.toString().trim() || 'No description available.', // Column E (index 4) - Description
-        registrationLink: row[5]?.toString().trim() || '#', // Column F (index 5) - Registration Link
-        imageURL: row[6]?.toString().trim() || '/placeholder.svg?height=200&width=300', // Column G (index 6) - Image URL
-        activityDate: row[7]?.toString().trim() || null, // Column H (index 7) - Activity Date
-        ageRange: row[8]?.toString().trim() || 'All ages' // Column I (index 8) - Age Range
+        id: id,  // Column A - ID (e.g., "activity-0003")
+        name: name, // Column C - Title (e.g., "Sunday Pony Rides at Marin Country Mart")
+        location: location || 'Location TBD', // Column D - Location
+        category: row[4]?.toString().trim() || 'General', // Column E - Category (assuming)
+        description: row[5]?.toString().trim() || 'No description available.', // Column F - Description (assuming)
+        registrationLink: row[6]?.toString().trim() || '#', // Column G - Registration Link (assuming)
+        imageURL: row[7]?.toString().trim() || '/placeholder.svg?height=200&width=300', // Column H - Image URL (assuming)
+        activityDate: activityDate || null, // Column B - Date (e.g., "4/13/2025")
+        ageRange: row[8]?.toString().trim() || 'All ages' // Column I - Age Range (assuming)
     };
 };
 

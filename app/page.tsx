@@ -1,4 +1,4 @@
-// app/page.tsx (Updated with proper separation)
+// app/page.tsx (Updated with correct hero image and better error handling)
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, Calendar, ExternalLink, Search, Users, MapPin } from "lucide-react";
@@ -32,6 +32,14 @@ const ActivitySkeleton = () => (
 
 // Activity display component - moved outside the main component
 function ActivityCards({ activities }: { activities: any[] }) {
+  // Default image handling
+  const getImageUrl = (activity: any) => {
+    if (!activity.imageURL || activity.imageURL === 'null' || activity.imageURL === '') {
+      return "/placeholder.svg?height=200&width=300";
+    }
+    return activity.imageURL;
+  };
+
   return (
     <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
       {activities.map((activity) => (
@@ -41,7 +49,7 @@ function ActivityCards({ activities }: { activities: any[] }) {
         >
           <div className="relative h-48 w-full bg-muted">
             <Image
-              src={activity.imageURL || "/placeholder.svg"}
+              src={getImageUrl(activity)}
               alt={activity.name}
               fill
               style={{ objectFit: 'cover' }}
@@ -54,15 +62,15 @@ function ActivityCards({ activities }: { activities: any[] }) {
             <div className="space-y-1.5 text-sm text-gray-600">
               <div className="flex items-center">
                 <Users className="mr-1.5 h-4 w-4 text-orange-500 flex-shrink-0" />
-                <span>{activity.ageRange}</span>
+                <span>{activity.ageRange || 'All ages'}</span>
               </div>
               <div className="flex items-center">
                 <MapPin className="mr-1.5 h-4 w-4 text-orange-500 flex-shrink-0" />
-                <span>{activity.location}</span>
+                <span>{activity.location || 'Various locations'}</span>
               </div>
               <div className="flex items-center pt-1">
                 <span className="rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800 border border-green-200 dark:bg-green-900/30 dark:text-green-300 dark:border-green-700">
-                  {activity.category}
+                  {activity.category || 'General'}
                 </span>
               </div>
             </div>
@@ -108,7 +116,7 @@ function WaitlistSection() {
       <div className="container mx-auto max-w-lg text-center">
         <h2 className="mb-2 text-2xl font-bold md:text-3xl text-gray-900 dark:text-orange-100">Be the First to Know!</h2>
         <p className="mb-6 text-gray-600 dark:text-orange-200">
-          PlayScout is launching soon. Enter your name and email below to get notified when we arrive in your area.
+          PlayScout is launching soon. Enter your email below to get notified when we arrive in your area.
         </p>
         <div className="waitlist-form-container">
           <WaitlistForm />
@@ -120,6 +128,9 @@ function WaitlistSection() {
 
 // Main page component
 export default function LandingPage() {
+  // Define the hero image path - update this with your actual image path
+  const heroImagePath = "/images/kids-playing.jpg";
+  
   return (
     <main className="flex-1">
       {/* Hero Section */}
@@ -142,14 +153,20 @@ export default function LandingPage() {
             </div>
             <div className="order-first md:order-last">
               <div className="relative mx-auto max-w-xl overflow-hidden rounded-lg shadow-lg">
+                {/* Updated image - use placeholder as fallback with onError */}
                 <Image
-                  src="/placeholder.svg?height=400&width=600"
+                  src={heroImagePath}
                   alt="Children playing and having fun"
                   width={600}
                   height={400}
                   className="h-auto w-full object-cover"
                   priority
                   unoptimized
+                  onError={(e) => {
+                    // Fallback to placeholder if the image fails to load
+                    const target = e.target as HTMLImageElement;
+                    target.src = "/placeholder.svg?height=400&width=600";
+                  }}
                 />
               </div>
             </div>

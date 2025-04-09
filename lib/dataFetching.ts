@@ -1,22 +1,44 @@
-// lib/dataFetching.ts - Separate data fetching logic from the page component
+// lib/dataFetching.ts - Improved with better debugging and error handling
 import { Activity } from './types';
 import { getActivities } from './googleSheets';
 
 // Helper function to check if a date is this weekend
 function isThisWeekend(dateStr: string | null): boolean {
-  if (!dateStr) return false;
+  if (!dateStr) {
+    console.log('Date string is null or empty');
+    return false;
+  }
+  
+  console.log(`Checking if date "${dateStr}" is this weekend`);
   
   try {
-    // Parse the date (assuming MM/dd/yyyy format)
-    const parts = dateStr.split('/');
-    if (parts.length !== 3) return false;
+    // Parse the date (try multiple formats)
+    let activityDate: Date | null = null;
     
-    const month = parseInt(parts[0], 10) - 1; // JS months are 0-indexed
-    const day = parseInt(parts[1], 10);
-    const year = parseInt(parts[2], 10);
+    // Try MM/dd/yyyy format
+    if (dateStr.match(/^\d{1,2}\/\d{1,2}\/\d{4}$/)) {
+      const parts = dateStr.split('/');
+      const month = parseInt(parts[0], 10) - 1;
+      const day = parseInt(parts[1], 10);
+      const year = parseInt(parts[2], 10);
+      activityDate = new Date(year, month, day);
+    } 
+    // Try yyyy-MM-dd format
+    else if (dateStr.match(/^\d{4}-\d{1,2}-\d{1,2}$/)) {
+      activityDate = new Date(dateStr);
+    }
+    // Try different locales
+    else {
+      activityDate = new Date(dateStr);
+    }
     
-    const activityDate = new Date(year, month, day);
+    if (isNaN(activityDate.getTime())) {
+      console.log(`Invalid date: ${dateStr}`);
+      return false;
+    }
+    
     const today = new Date();
+    console.log(`Today: ${today.toISOString().split('T')[0]}`);
     
     // Get the current day of week
     const currentDay = today.getDay(); // 0 = Sunday, 6 = Saturday
@@ -34,12 +56,20 @@ function isThisWeekend(dateStr: string | null): boolean {
     thisSunday.setDate(today.getDate() + daysUntilSunday);
     thisSunday.setHours(0, 0, 0, 0);
     
+    console.log(`This Saturday: ${thisSaturday.toISOString().split('T')[0]}`);
+    console.log(`This Sunday: ${thisSunday.toISOString().split('T')[0]}`);
+    console.log(`Activity date: ${activityDate.toISOString().split('T')[0]}`);
+    
     // Check if the activity date is this weekend
     activityDate.setHours(0, 0, 0, 0);
-    return (
+    
+    // Compare dates using their time values
+    const isWeekend = 
       activityDate.getTime() === thisSaturday.getTime() || 
-      activityDate.getTime() === thisSunday.getTime()
-    );
+      activityDate.getTime() === thisSunday.getTime();
+    
+    console.log(`Is weekend: ${isWeekend}`);
+    return isWeekend;
   } catch (error) {
     console.error("Error parsing date:", error);
     return false;
@@ -48,30 +78,51 @@ function isThisWeekend(dateStr: string | null): boolean {
 
 // Function to get the upcoming weekend activities
 export async function getWeekendActivities(): Promise<Activity[]> {
+  console.log("Starting getWeekendActivities");
+  
   try {
+    console.log("Fetching all activities");
     const allActivities = await getActivities();
+    console.log(`Fetched ${allActivities.length} activities`);
+    
+    if (allActivities.length === 0) {
+      console.log("No activities found, returning fallback activities");
+      return getFallbackActivities();
+    }
+    
+    // Log the first few activities for debugging
+    allActivities.slice(0, 3).forEach((activity, index) => {
+      console.log(`Activity ${index + 1}: ID=${activity.id}, Name=${activity.name}, Date=${activity.activityDate}`);
+    });
     
     // Filter activities for the upcoming weekend
-    const weekendActivities = allActivities.filter(activity => 
-      isThisWeekend(activity.activityDate)
-    );
+    console.log("Filtering for weekend activities");
+    const weekendActivities = allActivities.filter(activity => {
+      const isWeekend = isThisWeekend(activity.activityDate);
+      return isWeekend;
+    });
+    
+    console.log(`Found ${weekendActivities.length} weekend activities`);
     
     // If we have weekend activities, return the first 3
     if (weekendActivities.length > 0) {
+      console.log("Returning weekend activities");
       return weekendActivities.slice(0, 3);
     }
     
-    // If no weekend activities, fall back to the first 3 activities
+    // If no weekend activities, log that we're falling back
+    console.log("No weekend activities found, returning first 3 activities");
     return allActivities.slice(0, 3);
   } catch (error) {
     console.error("Error fetching weekend activities:", error);
-    // Return empty array to prevent build failures
-    return [];
+    console.log("Returning fallback activities due to error");
+    return getFallbackActivities();
   }
 }
 
-// Function to get the default/fallback activities if API fails
+// Improved fallback activities with better images
 export function getFallbackActivities(): Activity[] {
+  console.log("Using fallback activities");
   return [
     { 
       id: "1", 
@@ -79,7 +130,7 @@ export function getFallbackActivities(): Activity[] {
       ageRange: "4-6 years", 
       location: "City Park", 
       category: "Sports", 
-      imageURL: "/placeholder.svg?height=200&width=300",
+      imageURL: "/images/soccer-kids.jpg", // Update with your actual image path
       description: "Introduction to soccer for young children.",
       registrationLink: "#",
       activityDate: null
@@ -90,7 +141,7 @@ export function getFallbackActivities(): Activity[] {
       ageRange: "7-10 years", 
       location: "Community Center", 
       category: "Arts", 
-      imageURL: "/placeholder.svg?height=200&width=300",
+      imageURL: "/images/art-workshop.jpg", // Update with your actual image path
       description: "Fun art projects for elementary school kids.",
       registrationLink: "#",
       activityDate: null
@@ -101,7 +152,7 @@ export function getFallbackActivities(): Activity[] {
       ageRange: "8-12 years", 
       location: "Tech Hub Downtown", 
       category: "STEM", 
-      imageURL: "/placeholder.svg?height=200&width=300",
+      imageURL: "/images/coding-camp.jpg", // Update with your actual image path
       description: "Introduction to coding concepts for kids.",
       registrationLink: "#",
       activityDate: null

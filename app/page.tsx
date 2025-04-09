@@ -1,11 +1,11 @@
-// app/page.tsx (Layout changes: Moved Submit/Contact buttons, removed sections)
+// app/page.tsx (Corrected: Layout changes applied, uses DIRECT WaitlistForm import)
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowRight, Calendar, ExternalLink, Search, Users, MapPin, MessageSquare } from "lucide-react"; // Added MessageSquare for Contact button
+import { ArrowRight, Calendar, ExternalLink, Search, Users, MapPin, MessageSquare } from "lucide-react"; // Added MessageSquare
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { ClientWaitlistFormLoader } from '@/components/ClientWaitlistFormLoader'; // Use the loader
+import { WaitlistForm } from "@/components/WaitlistForm"; // <--- Use the DIRECT import again
 
 // Sample data
 const featuredActivities = [
@@ -14,7 +14,7 @@ const featuredActivities = [
   { id: "3", name: "Future Coders Camp", ageRange: "8-12 years", location: "Tech Hub Downtown", category: "STEM", imageURL: "/placeholder.svg?height=200&width=300", },
 ];
 
-// Assuming RootLayout handles overall structure, ThemeProvider, Toasters etc.
+// Assuming RootLayout provides overall structure, ThemeProvider, Toasters etc.
 export default function LandingPage() {
   return (
     <main className="flex-1">
@@ -37,7 +37,7 @@ export default function LandingPage() {
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </Link>
                 </Button>
-                {/* --- Submit Activity Button Added Here --- */}
+                {/* --- Submit Activity Button Moved Here --- */}
                 <Button size="lg" variant="outline" className="border-green-600 text-green-600 hover:bg-green-50 hover:text-green-700 dark:border-green-500 dark:text-green-400 dark:hover:bg-gray-800 dark:hover:text-green-300" asChild>
                    <Link href="/submit">
                        Submit Your Activity
@@ -65,7 +65,6 @@ export default function LandingPage() {
 
       {/* Featured Activities Section */}
       <section id="featured-activities" className="px-4 py-12 md:py-16">
-        {/* ... Featured Activities content remains the same ... */}
          <div className="container mx-auto">
            <h2 className="mb-8 text-center text-2xl font-bold md:text-3xl text-gray-800 dark:text-gray-100">Featured Activities</h2>
            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -100,7 +99,6 @@ export default function LandingPage() {
 
       {/* How It Works Section */}
       <section id="how-it-works" className="bg-gray-50 px-4 py-12 md:py-16 dark:bg-gray-800">
-         {/* ... How It Works content remains the same ... */}
          <div className="container mx-auto max-w-5xl">
            <h2 className="mb-8 text-center text-2xl font-bold md:text-3xl text-gray-800 dark:text-gray-100">How PlayScout Works</h2>
            <div className="grid gap-8 md:grid-cols-3">
@@ -118,9 +116,10 @@ export default function LandingPage() {
            <p className="mb-6 text-gray-600 dark:text-orange-200">
              PlayScout is launching soon. Enter your email below to get notified when we arrive in your area.
            </p>
-           <ClientWaitlistFormLoader />
-           {/* --- Contact Us Button Added Here --- */}
-           <div className="mt-6"> {/* Added margin-top for spacing */}
+           {/* Use the DIRECT import of WaitlistForm */}
+           <WaitlistForm />
+           {/* --- Contact Us Button Moved Here --- */}
+           <div className="mt-6">
                 <Button variant="outline" className="border-orange-500 text-orange-500 hover:bg-orange-50 hover:text-orange-600 dark:border-orange-400 dark:text-orange-400 dark:hover:bg-gray-800 dark:hover:text-orange-300" asChild>
                     <Link href="/contact">
                         <MessageSquare className="mr-2 h-4 w-4" /> Contact Us
@@ -132,7 +131,6 @@ export default function LandingPage() {
        </section>
 
       {/* --- Removed Submit CTA Section --- */}
-      {/* <section id="submit-cta" ... > ... </section> */}
 
     </main>
   );

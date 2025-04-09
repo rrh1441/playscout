@@ -84,17 +84,30 @@ function ActivityCards({ activities }: { activities: any[] }) {
                   {activity.category || "General"}
                 </span>
               </div>
+              
+              {/* Added description */}
+              {activity.description && (
+                <div className="mt-3 text-sm text-gray-600">
+                  <p className="line-clamp-3">{activity.description}</p>
+                </div>
+              )}
             </div>
           </CardContent>
-          <CardFooter className="border-t bg-gray-50 p-3 dark:bg-gray-800">
-            <Button
-              variant="outline"
-              className="w-full border-orange-500 text-orange-500 hover:bg-orange-50 hover:text-orange-600 dark:border-orange-400 dark:text-orange-400 dark:hover:bg-gray-700 dark:hover:text-orange-300"
-              asChild
-            >
-              <Link href={`/activities/${activity.id}`}>View Details</Link>
-            </Button>
-          </CardFooter>
+          
+          {/* Registration button (instead of View Details) */}
+          {activity.registrationLink && activity.registrationLink !== '#' ? (
+            <CardFooter className="border-t bg-gray-50 p-3 dark:bg-gray-800">
+              <Button
+                variant="outline"
+                className="w-full border-orange-500 text-orange-500 hover:bg-orange-50 hover:text-orange-600 dark:border-orange-400 dark:text-orange-400 dark:hover:bg-gray-700 dark:hover:text-orange-300"
+                asChild
+              >
+                <Link href={activity.registrationLink} target="_blank" rel="noopener noreferrer">
+                  Register
+                </Link>
+              </Button>
+            </CardFooter>
+          ) : null}
         </Card>
       ))}
     </div>

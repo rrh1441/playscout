@@ -1,15 +1,12 @@
-// lib/dataFetching.ts - Updated to match new Google Sheets approach
+// lib/dataFetching.ts - With better fallbacks
 import { Activity } from './types';
 import { getActivities } from './googleSheets';
 
 // Helper function to check if a date is this weekend
 function isThisWeekend(dateStr: string | null): boolean {
   if (!dateStr) {
-    console.log('Date string is null or empty');
     return false;
   }
-  
-  console.log(`Checking if date "${dateStr}" is this weekend`);
   
   try {
     // Parse the date (try multiple formats)
@@ -33,12 +30,10 @@ function isThisWeekend(dateStr: string | null): boolean {
     }
     
     if (isNaN(activityDate.getTime())) {
-      console.log(`Invalid date: ${dateStr}`);
       return false;
     }
     
     const today = new Date();
-    console.log(`Today: ${today.toISOString().split('T')[0]}`);
     
     // Get the current day of week
     const currentDay = today.getDay(); // 0 = Sunday, 6 = Saturday
@@ -56,73 +51,49 @@ function isThisWeekend(dateStr: string | null): boolean {
     thisSunday.setDate(today.getDate() + daysUntilSunday);
     thisSunday.setHours(0, 0, 0, 0);
     
-    console.log(`This Saturday: ${thisSaturday.toISOString().split('T')[0]}`);
-    console.log(`This Sunday: ${thisSunday.toISOString().split('T')[0]}`);
-    console.log(`Activity date: ${activityDate.toISOString().split('T')[0]}`);
-    
     // Check if the activity date is this weekend
     activityDate.setHours(0, 0, 0, 0);
     
     // Compare dates using their time values
-    const isWeekend = 
+    return (
       activityDate.getTime() === thisSaturday.getTime() || 
-      activityDate.getTime() === thisSunday.getTime();
-    
-    console.log(`Is weekend: ${isWeekend}`);
-    return isWeekend;
+      activityDate.getTime() === thisSunday.getTime()
+    );
   } catch (error) {
-    console.error("Error parsing date:", error);
     return false;
   }
 }
 
 // Function to get the upcoming weekend activities
 export async function getWeekendActivities(): Promise<Activity[]> {
-  console.log("Starting getWeekendActivities");
-  
   try {
-    console.log("Fetching all activities");
     const allActivities = await getActivities();
-    console.log(`Fetched ${allActivities.length} activities`);
     
-    if (allActivities.length === 0) {
-      console.log("No activities found, returning fallback activities");
+    // If no activities fetched, return fallbacks
+    if (!allActivities || allActivities.length === 0) {
       return getFallbackActivities();
     }
     
-    // Log the first few activities for debugging
-    allActivities.slice(0, 3).forEach((activity, index) => {
-      console.log(`Activity ${index + 1}: ID=${activity.id}, Name=${activity.name}, Date=${activity.activityDate}`);
-    });
-    
     // Filter activities for the upcoming weekend
-    console.log("Filtering for weekend activities");
-    const weekendActivities = allActivities.filter(activity => {
-      const isWeekend = isThisWeekend(activity.activityDate);
-      return isWeekend;
-    });
-    
-    console.log(`Found ${weekendActivities.length} weekend activities`);
+    const weekendActivities = allActivities.filter(activity => 
+      isThisWeekend(activity.activityDate)
+    );
     
     // If we have weekend activities, return the first 3
     if (weekendActivities.length > 0) {
-      console.log("Returning weekend activities");
       return weekendActivities.slice(0, 3);
     }
     
-    // If no weekend activities, log that we're falling back
-    console.log("No weekend activities found, returning first 3 activities");
+    // If no weekend activities, fall back to the first 3 activities
     return allActivities.slice(0, 3);
   } catch (error) {
     console.error("Error fetching weekend activities:", error);
-    console.log("Returning fallback activities due to error");
     return getFallbackActivities();
   }
 }
 
 // Function to get the default/fallback activities if API fails
 export function getFallbackActivities(): Activity[] {
-  console.log("Using fallback activities");
   return [
     { 
       id: "1", 
@@ -130,8 +101,9 @@ export function getFallbackActivities(): Activity[] {
       ageRange: "4-6 years", 
       location: "City Park", 
       category: "Sports", 
-      imageURL: "/placeholder.svg?height=200&width=300", // Use placeholder for safety
-      description: "Introduction to soccer for young children.",
+      // Use the Next.js API placeholder endpoint for guaranteed working images
+      imageURL: "/api/placeholder/300/200?text=Soccer", 
+      description: "Introduction to soccer for young children. Learn basic skills through fun games and activities.",
       registrationLink: "#",
       activityDate: null
     },
@@ -141,8 +113,8 @@ export function getFallbackActivities(): Activity[] {
       ageRange: "7-10 years", 
       location: "Community Center", 
       category: "Arts", 
-      imageURL: "/placeholder.svg?height=200&width=300", // Use placeholder for safety
-      description: "Fun art projects for elementary school kids.",
+      imageURL: "/api/placeholder/300/200?text=Art+Workshop", 
+      description: "Fun art projects for elementary school kids. Explore different materials and techniques.",
       registrationLink: "#",
       activityDate: null
     },
@@ -152,8 +124,8 @@ export function getFallbackActivities(): Activity[] {
       ageRange: "8-12 years", 
       location: "Tech Hub Downtown", 
       category: "STEM", 
-      imageURL: "/placeholder.svg?height=200&width=300", // Use placeholder for safety
-      description: "Introduction to coding concepts for kids.",
+      imageURL: "/api/placeholder/300/200?text=Coding+Camp", 
+      description: "Introduction to coding concepts for kids. Create simple games and animations.",
       registrationLink: "#",
       activityDate: null
     },

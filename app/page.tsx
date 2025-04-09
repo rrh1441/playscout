@@ -1,4 +1,4 @@
-// app/page.tsx (Updated without onError handler)
+// app/page.tsx (Complete Fix)
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, Calendar, ExternalLink, Search, Users, MapPin } from "lucide-react";
@@ -30,12 +30,12 @@ const ActivitySkeleton = () => (
   </div>
 );
 
-// Activity display component - moved outside the main component
+// Activity display component
 function ActivityCards({ activities }: { activities: any[] }) {
   // Default image handling
   const getImageUrl = (activity: any) => {
     if (!activity.imageURL || activity.imageURL === 'null' || activity.imageURL === '') {
-      return "/placeholder.svg?height=200&width=300";
+      return `/api/placeholder/300/200?text=${encodeURIComponent(activity.name)}`;
     }
     return activity.imageURL;
   };
@@ -109,7 +109,7 @@ async function FeaturedActivities() {
   return <ActivityCards activities={activities} />;
 }
 
-// WaitlistSection component - moved outside the main component
+// WaitlistSection component
 function WaitlistSection() {
   return (
     <section id="waitlist" className="bg-orange-50 px-4 py-10 md:py-12 dark:bg-orange-900/20">
@@ -126,48 +126,52 @@ function WaitlistSection() {
   );
 }
 
-// Main page component
-export default function LandingPage() {
-  // Define the hero image path - update this with your actual image path or use placeholder
-  const heroImagePath = "/placeholder.svg?height=400&width=600";
-  
+// Hero Section component 
+function HeroSection() {
   return (
-    <main className="flex-1">
-      {/* Hero Section */}
-      <section className="bg-gradient-to-b from-orange-50 to-white px-4 py-10 md:py-14 lg:py-20">
-        <div className="container mx-auto">
-          <div className="grid items-center gap-8 md:grid-cols-2">
-            <div className="text-center md:text-left">
-              <h1 className="mb-3 text-3xl font-bold leading-tight tracking-tighter md:text-4xl lg:text-5xl text-gray-900">
-                Find the perfect activity for your kid—fast
-              </h1>
-              <p className="mb-6 text-lg text-gray-600 md:text-xl">
-                Discover and explore the best local activities, classes, and camps for children of all ages.
-              </p>
-              <Button size="lg" className="bg-orange-500 px-8 hover:bg-orange-600" asChild>
-                <Link href="/activities">
-                  Browse Activities
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Link>
-              </Button>
-            </div>
-            <div className="order-first md:order-last">
-              <div className="relative mx-auto max-w-xl overflow-hidden rounded-lg shadow-lg">
-                {/* Use placeholder image - removed onError handler */}
-                <Image
-                  src={heroImagePath}
-                  alt="Children playing and having fun"
-                  width={600}
-                  height={400}
-                  className="h-auto w-full object-cover"
-                  priority
-                  unoptimized
-                />
-              </div>
+    <section className="bg-gradient-to-b from-orange-50 to-white px-4 py-10 md:py-14 lg:py-20">
+      <div className="container mx-auto">
+        <div className="grid items-center gap-8 md:grid-cols-2">
+          <div className="text-center md:text-left">
+            <h1 className="mb-3 text-3xl font-bold leading-tight tracking-tighter md:text-4xl lg:text-5xl text-gray-900">
+              Find the perfect activity for your kid—fast
+            </h1>
+            <p className="mb-6 text-lg text-gray-600 md:text-xl">
+              Discover and explore the best local activities, classes, and camps for children of all ages.
+            </p>
+            <Button size="lg" className="bg-orange-500 px-8 hover:bg-orange-600" asChild>
+              <Link href="/activities">
+                Browse Activities
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Link>
+            </Button>
+          </div>
+          <div className="order-first md:order-last">
+            <div className="relative mx-auto max-w-xl overflow-hidden rounded-lg shadow-lg">
+              {/* Using Next.js API placeholder for guaranteed working image */}
+              <Image
+                src="/api/placeholder/600/400"
+                alt="Children playing and having fun"
+                width={600}
+                height={400}
+                className="h-auto w-full object-cover"
+                priority
+                unoptimized
+              />
             </div>
           </div>
         </div>
-      </section>
+      </div>
+    </section>
+  );
+}
+
+// Main page component
+export default function LandingPage() {
+  return (
+    <main className="flex-1">
+      {/* Hero Section */}
+      <HeroSection />
 
       {/* Featured Activities Section */}
       <section id="featured-activities" className="px-4 py-12 md:py-16">
@@ -217,7 +221,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Waitlist Section - Using the extracted component */}
+      {/* Waitlist Section */}
       <WaitlistSection />
 
       {/* Call to Action / Submit */}

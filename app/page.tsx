@@ -1,4 +1,4 @@
-// app/page.tsx (Updated with correct hero image and better error handling)
+// app/page.tsx (Updated without onError handler)
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, Calendar, ExternalLink, Search, Users, MapPin } from "lucide-react";
@@ -128,8 +128,8 @@ function WaitlistSection() {
 
 // Main page component
 export default function LandingPage() {
-  // Define the hero image path - update this with your actual image path
-  const heroImagePath = "/images/kids-playing.jpg";
+  // Define the hero image path - update this with your actual image path or use placeholder
+  const heroImagePath = "/placeholder.svg?height=400&width=600";
   
   return (
     <main className="flex-1">
@@ -153,7 +153,7 @@ export default function LandingPage() {
             </div>
             <div className="order-first md:order-last">
               <div className="relative mx-auto max-w-xl overflow-hidden rounded-lg shadow-lg">
-                {/* Updated image - use placeholder as fallback with onError */}
+                {/* Use placeholder image - removed onError handler */}
                 <Image
                   src={heroImagePath}
                   alt="Children playing and having fun"
@@ -162,11 +162,6 @@ export default function LandingPage() {
                   className="h-auto w-full object-cover"
                   priority
                   unoptimized
-                  onError={(e) => {
-                    // Fallback to placeholder if the image fails to load
-                    const target = e.target as HTMLImageElement;
-                    target.src = "/placeholder.svg?height=400&width=600";
-                  }}
                 />
               </div>
             </div>

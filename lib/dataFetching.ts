@@ -1,4 +1,4 @@
-// lib/dataFetching.ts - Improved with better debugging and error handling
+// lib/dataFetching.ts - Updated to match new Google Sheets approach
 import { Activity } from './types';
 import { getActivities } from './googleSheets';
 
@@ -120,7 +120,7 @@ export async function getWeekendActivities(): Promise<Activity[]> {
   }
 }
 
-// Improved fallback activities with better images
+// Function to get the default/fallback activities if API fails
 export function getFallbackActivities(): Activity[] {
   console.log("Using fallback activities");
   return [
@@ -130,7 +130,7 @@ export function getFallbackActivities(): Activity[] {
       ageRange: "4-6 years", 
       location: "City Park", 
       category: "Sports", 
-      imageURL: "/images/soccer-kids.jpg", // Update with your actual image path
+      imageURL: "/placeholder.svg?height=200&width=300", // Use placeholder for safety
       description: "Introduction to soccer for young children.",
       registrationLink: "#",
       activityDate: null
@@ -141,7 +141,7 @@ export function getFallbackActivities(): Activity[] {
       ageRange: "7-10 years", 
       location: "Community Center", 
       category: "Arts", 
-      imageURL: "/images/art-workshop.jpg", // Update with your actual image path
+      imageURL: "/placeholder.svg?height=200&width=300", // Use placeholder for safety
       description: "Fun art projects for elementary school kids.",
       registrationLink: "#",
       activityDate: null
@@ -152,7 +152,7 @@ export function getFallbackActivities(): Activity[] {
       ageRange: "8-12 years", 
       location: "Tech Hub Downtown", 
       category: "STEM", 
-      imageURL: "/images/coding-camp.jpg", // Update with your actual image path
+      imageURL: "/placeholder.svg?height=200&width=300", // Use placeholder for safety
       description: "Introduction to coding concepts for kids.",
       registrationLink: "#",
       activityDate: null

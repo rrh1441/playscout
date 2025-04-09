@@ -1,4 +1,3 @@
-// components/WaitlistForm.tsx (Name Removed, Logs Kept)
 'use client';
 
 import React, { useState } from 'react';
@@ -8,8 +7,14 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Loader2 } from 'lucide-react';
 
+// Define loading indicator outside the component to avoid nested component definition
+const LoadingIndicator = () => (
+  <>
+    <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Working...
+  </>
+);
+
 export function WaitlistForm() {
-    // Removed name state
     const [email, setEmail] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -69,7 +74,6 @@ export function WaitlistForm() {
                 duration: 5000,
             });
             setSuccess(true);
-            // Removed clearing name state
             setEmail(''); // Clear email field
 
         } catch (error: any) {
@@ -94,7 +98,6 @@ export function WaitlistForm() {
         );
     }
 
-    // Simplified form layout for email only
     return (
         <form onSubmit={handleSubmit} className="space-y-4">
             <div className="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2">
@@ -116,15 +119,9 @@ export function WaitlistForm() {
                 <Button
                     type="submit"
                     className="w-full sm:w-auto bg-orange-500 hover:bg-orange-600 disabled:opacity-70 shrink-0"
-                    disabled={isSubmitting || !email} // Disable if submitting or email is empty
+                    disabled={isSubmitting || !email}
                 >
-                    {isSubmitting ? (
-                         <>
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Working...
-                         </>
-                     ) : (
-                        'Join Waitlist'
-                     )}
+                    {isSubmitting ? <LoadingIndicator /> : 'Join Waitlist'}
                 </Button>
             </div>
             {error && <p id="waitlist-error" className="text-sm text-destructive text-center sm:text-left pt-1">{error}</p>}

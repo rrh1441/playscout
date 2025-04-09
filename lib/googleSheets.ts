@@ -1,4 +1,4 @@
-// lib/googleSheets.ts (Minimal Fix - Only fixes the Google Sheets connection)
+// lib/googleSheets.ts (Corrected Field Mapping)
 import { google } from 'googleapis';
 import { Activity } from './types';
 
@@ -33,26 +33,27 @@ try {
 }
 const sheets = auth ? google.sheets({ version: 'v4', auth }) : null;
 
-// Normalize function - Adjust field indices based on your actual sheet structure
+// CORRECTED normalizeActivity function - Fixed field mapping to match your needs
 const normalizeActivity = (row: any[], rowIndex: number): Activity | null => {
     if (!row || row.length < 2) return null;
     
-    // Start with index 0 (not 1) for the first column A
+    // Map fields correctly based on your sheet structure
+    // Use column A as ID (index 0), use column B as name (index 1), etc.
     const id = row[0]?.toString().trim();
-    const name = row[1]?.toString().trim();
+    const name = row[1]?.toString().trim(); // This is the activity name/title
     
     if (!id || !name) return null;
     
     return { 
-        id: id, 
-        name: name, 
-        location: row[2]?.toString().trim() || 'N/A', 
-        category: row[3]?.toString().trim() || 'General', 
-        description: row[4]?.toString().trim() || 'No description.', 
-        registrationLink: row[5]?.toString().trim() || '#', 
-        imageURL: row[6]?.toString().trim() || '/placeholder.svg?height=200&width=300', 
-        activityDate: row[7]?.toString().trim() || null, 
-        ageRange: row[8]?.toString().trim() || 'N/A' 
+        id: id,  // Column A (index 0) - ID
+        name: name, // Column B (index 1) - Name/Title
+        location: row[2]?.toString().trim() || 'Location TBD', // Column C (index 2) - Location
+        category: row[3]?.toString().trim() || 'General', // Column D (index 3) - Category
+        description: row[4]?.toString().trim() || 'No description available.', // Column E (index 4) - Description
+        registrationLink: row[5]?.toString().trim() || '#', // Column F (index 5) - Registration Link
+        imageURL: row[6]?.toString().trim() || '/placeholder.svg?height=200&width=300', // Column G (index 6) - Image URL
+        activityDate: row[7]?.toString().trim() || null, // Column H (index 7) - Activity Date
+        ageRange: row[8]?.toString().trim() || 'All ages' // Column I (index 8) - Age Range
     };
 };
 
@@ -69,6 +70,7 @@ export async function getActivities(): Promise<Activity[]> {
         // Method 1: Try getting all values (without specifying sheet name)
         let response;
         try {
+            console.log("Attempting to fetch from sheet ID:", GOOGLE_SHEET_ID);
             response = await sheets.spreadsheets.values.get({
                 spreadsheetId: GOOGLE_SHEET_ID,
                 range: 'A2:J',
@@ -98,11 +100,23 @@ export async function getActivities(): Promise<Activity[]> {
         }
         
         console.log(`Fetched ${rows.length} raw activity rows.`);
+        
+        // Log first row to help debug
+        if (rows.length > 0) {
+            console.log("First row sample:", rows[0]);
+        }
+        
         const activities = rows
             .map((row, index) => normalizeActivity(row, index))
             .filter((activity): activity is Activity => activity !== null);
             
         console.log(`Normalized ${activities.length} valid activities.`);
+        
+        // Log first activity to verify mapping
+        if (activities.length > 0) {
+            console.log("First normalized activity:", activities[0]);
+        }
+        
         return activities;
     } catch (err: any) {
         console.error('Error fetching activities from Google Sheets:', err.message); 

@@ -7,8 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast"; // Assuming you want toast notifications
-import { Toaster } from '@/components/ui/toaster'; // Import toaster
-
+// Toaster import removed - it's now in the RootLayout
 
 export function ContactForm() {
     const [email, setEmail] = useState('');
@@ -44,47 +43,45 @@ export function ContactForm() {
     };
 
     return (
-        <>
-         <Toaster /> {/* Add Toaster component to render toasts */}
-         <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-                <Label htmlFor="email" className="mb-1 block text-sm font-medium">
-                    Your Email
-                </Label>
-                <Input
-                    id="email"
-                    name="email"
-                    type="email"
-                    placeholder="you@example.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                    className='bg-white' // Ensure input has background for contrast
-                />
-            </div>
-            <div>
-                <Label htmlFor="message" className="mb-1 block text-sm font-medium">
-                    Message
-                </Label>
-                <Textarea
-                    id="message"
-                    name="message"
-                    placeholder="How can we help you?"
-                    rows={5}
-                    value={message}
-                    onChange={(e) => setMessage(e.target.value)}
-                    required
-                    className='bg-white' // Ensure textarea has background for contrast
-                />
-            </div>
-            <Button
-                type="submit"
-                className="w-full bg-orange-500 hover:bg-orange-600 disabled:opacity-70"
-                disabled={isSubmitting}
-            >
-                {isSubmitting ? 'Sending...' : 'Send Message'}
-            </Button>
+        // Removed Toaster component render
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+              <Label htmlFor="email" className="mb-1 block text-sm font-medium">
+                  Your Email
+              </Label>
+              <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  placeholder="you@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  className='bg-white' // Ensure input has background for contrast
+              />
+          </div>
+          <div>
+              <Label htmlFor="message" className="mb-1 block text-sm font-medium">
+                  Message
+              </Label>
+              <Textarea
+                  id="message"
+                  name="message"
+                  placeholder="How can we help you?"
+                  rows={5}
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  required
+                  className='bg-white' // Ensure textarea has background for contrast
+              />
+          </div>
+          <Button
+              type="submit"
+              className="w-full bg-orange-500 hover:bg-orange-600 disabled:opacity-70"
+              disabled={isSubmitting}
+          >
+              {isSubmitting ? 'Sending...' : 'Send Message'}
+          </Button>
         </form>
-        </>
     );
 }

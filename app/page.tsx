@@ -1,11 +1,11 @@
-// app/page.tsx (Corrected: Layout changes applied, uses DIRECT WaitlistForm import)
+// app/page.tsx (Contact Us button moved next to Waitlist form)
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, Calendar, ExternalLink, Search, Users, MapPin, MessageSquare } from "lucide-react"; // Added MessageSquare
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { WaitlistForm } from "@/components/WaitlistForm"; // <--- Use the DIRECT import again
+import { WaitlistForm } from "@/components/WaitlistForm"; // Using direct import
 
 // Sample data
 const featuredActivities = [
@@ -14,7 +14,6 @@ const featuredActivities = [
   { id: "3", name: "Future Coders Camp", ageRange: "8-12 years", location: "Tech Hub Downtown", category: "STEM", imageURL: "/placeholder.svg?height=200&width=300", },
 ];
 
-// Assuming RootLayout provides overall structure, ThemeProvider, Toasters etc.
 export default function LandingPage() {
   return (
     <main className="flex-1">
@@ -29,7 +28,6 @@ export default function LandingPage() {
               <p className="mb-6 text-lg text-gray-600 md:text-xl dark:text-gray-400">
                 Discover and explore the best local activities, classes, and camps for children of all ages.
               </p>
-              {/* --- Button Group in Hero --- */}
               <div className="flex flex-wrap gap-4 justify-center md:justify-start">
                 <Button size="lg" className="bg-orange-500 px-8 hover:bg-orange-600" asChild>
                   <Link href="/activities">
@@ -37,14 +35,12 @@ export default function LandingPage() {
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </Link>
                 </Button>
-                {/* --- Submit Activity Button Moved Here --- */}
                 <Button size="lg" variant="outline" className="border-green-600 text-green-600 hover:bg-green-50 hover:text-green-700 dark:border-green-500 dark:text-green-400 dark:hover:bg-gray-800 dark:hover:text-green-300" asChild>
                    <Link href="/submit">
                        Submit Your Activity
                    </Link>
                 </Button>
               </div>
-              {/* --- End Button Group --- */}
             </div>
             <div className="order-first md:order-last">
               <div className="relative mx-auto max-w-xl overflow-hidden rounded-lg shadow-lg">
@@ -111,26 +107,32 @@ export default function LandingPage() {
 
        {/* Waitlist Section */}
        <section id="waitlist" className="bg-orange-50 px-4 py-10 md:py-12 dark:bg-orange-900/20">
-         <div className="container mx-auto max-w-lg text-center">
+         <div className="container mx-auto max-w-2xl text-center"> {/* Adjusted max-width slightly */}
            <h2 className="mb-2 text-2xl font-bold md:text-3xl text-gray-900 dark:text-orange-100">Be the First to Know!</h2>
            <p className="mb-6 text-gray-600 dark:text-orange-200">
              PlayScout is launching soon. Enter your email below to get notified when we arrive in your area.
            </p>
-           {/* Use the DIRECT import of WaitlistForm */}
-           <WaitlistForm />
-           {/* --- Contact Us Button Moved Here --- */}
-           <div className="mt-6">
-                <Button variant="outline" className="border-orange-500 text-orange-500 hover:bg-orange-50 hover:text-orange-600 dark:border-orange-400 dark:text-orange-400 dark:hover:bg-gray-800 dark:hover:text-orange-300" asChild>
-                    <Link href="/contact">
-                        <MessageSquare className="mr-2 h-4 w-4" /> Contact Us
-                    </Link>
-               </Button>
+           {/* --- Flex Container for Form and Contact Button --- */}
+           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-4">
+             {/* Use the direct import of WaitlistForm */}
+             <div className="w-full max-w-lg"> {/* Constrain form width */}
+                <WaitlistForm />
+             </div>
+             {/* --- Contact Us Button Moved Here --- */}
+             <div className="shrink-0"> {/* Prevent button from shrinking */}
+                  <Button variant="outline" className="border-orange-500 text-orange-500 hover:bg-orange-50 hover:text-orange-600 dark:border-orange-400 dark:text-orange-400 dark:hover:bg-gray-800 dark:hover:text-orange-300" asChild>
+                      <Link href="/contact">
+                          <MessageSquare className="mr-2 h-4 w-4" /> Contact Us
+                      </Link>
+                 </Button>
+              </div>
+              {/* --- End Contact Us Button --- */}
             </div>
-            {/* --- End Contact Us Button --- */}
+            {/* --- End Flex Container --- */}
          </div>
        </section>
 
-      {/* --- Removed Submit CTA Section --- */}
+      {/* Removed Submit CTA Section */}
 
     </main>
   );

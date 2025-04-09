@@ -1,77 +1,74 @@
-// components/ActivityCard.tsx
-import Link from 'next/link';
-import Image from 'next/image';
-import { Activity } from '@/lib/types';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Users, MapPin, Tag } from "lucide-react"; // Using Tag for category
+// Updated Activity Cards Component with Description instead of View Details
+// This is only the ActivityCards function - you'll need to locate it in your code
 
-interface ActivityCardProps {
-    activity: Activity;
-}
-
-// Define category colors (adjust as needed)
-const categoryColors: { [key: string]: string } = {
-    "Sports": "bg-blue-100 text-blue-800 border-blue-200",
-    "Arts": "bg-purple-100 text-purple-800 border-purple-200",
-    "STEM": "bg-green-100 text-green-800 border-green-200",
-    "Music": "bg-yellow-100 text-yellow-800 border-yellow-200",
-    "Dance": "bg-pink-100 text-pink-800 border-pink-200",
-    "General": "bg-gray-100 text-gray-800 border-gray-200",
-    // Add more categories and their corresponding Tailwind classes
-};
-
-const defaultColor = "bg-gray-100 text-gray-800 border-gray-200";
-
-
-export function ActivityCard({ activity }: ActivityCardProps) {
-    const badgeColor = categoryColors[activity.category] || defaultColor;
-
+function ActivityCards({ activities }: { activities: any[] }) {
+    // Default image handling
+    const getImageUrl = (activity: any) => {
+      if (!activity.imageURL || activity.imageURL === 'null' || activity.imageURL === '') {
+        return `/api/placeholder/300/200?text=${encodeURIComponent(activity.name)}`;
+      }
+      return activity.imageURL;
+    };
+  
     return (
-        <Card className="flex flex-col overflow-hidden rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 h-full">
-             {/* Image */}
-            <div className="relative h-48 w-full">
-                 <Image
-                    src={activity.imageURL || "/placeholder.svg"} // Use placeholder if no image
-                    alt={activity.name}
-                    fill // Use fill layout
-                    style={{ objectFit: "cover" }} // Cover the area
-                    className="rounded-t-lg"
-                    // Consider adding sizes for optimization if using next/image with external URLs
-                    // sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                    unoptimized={!activity.imageURL} // Avoid optimization for placeholder
-                />
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {activities.map((activity) => (
+          <Card 
+            key={activity.id} 
+            className="flex flex-col overflow-hidden rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 h-full"
+          >
+            <div className="relative h-48 w-full bg-muted">
+              <Image
+                src={getImageUrl(activity)}
+                alt={activity.name}
+                fill
+                style={{ objectFit: 'cover' }}
+                className="rounded-t-lg"
+                unoptimized
+              />
             </div>
-
-             {/* Content */}
             <CardContent className="p-4 flex-grow">
-                <h3 className="mb-2 text-lg font-semibold leading-tight text-gray-800">{activity.name}</h3>
-                <div className="space-y-1.5 text-sm text-gray-600">
-                     <div className="flex items-center">
-                        <Users className="mr-1.5 h-4 w-4 text-orange-500 flex-shrink-0" />
-                        <span>{activity.ageRange}</span>
-                    </div>
-                    <div className="flex items-center">
-                        <MapPin className="mr-1.5 h-4 w-4 text-orange-500 flex-shrink-0" />
-                        <span>{activity.location}</span>
-                    </div>
-                    <div className="flex items-center pt-1">
-                        <Badge variant="outline" className={`text-xs font-medium ${badgeColor}`}>
-                            {activity.category}
-                        </Badge>
-                    </div>
+              <h3 className="mb-2 text-lg font-semibold leading-tight text-gray-800">{activity.name}</h3>
+              <div className="space-y-1.5 text-sm text-gray-600">
+                <div className="flex items-center">
+                  <Users className="mr-1.5 h-4 w-4 text-orange-500 flex-shrink-0" />
+                  <span>{activity.ageRange || 'All ages'}</span>
                 </div>
+                <div className="flex items-center">
+                  <MapPin className="mr-1.5 h-4 w-4 text-orange-500 flex-shrink-0" />
+                  <span>{activity.location || 'Various locations'}</span>
+                </div>
+                <div className="flex items-center pt-1">
+                  <span className="rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800 border border-green-200 dark:bg-green-900/30 dark:text-green-300 dark:border-green-700">
+                    {activity.category || 'General'}
+                  </span>
+                </div>
+                
+                {/* Added description */}
+                {activity.description && (
+                  <div className="mt-3 text-sm text-gray-600">
+                    <p className="line-clamp-3">{activity.description}</p>
+                  </div>
+                )}
+              </div>
             </CardContent>
-
-             {/* Footer Button */}
-            <CardFooter className="border-t bg-gray-50 p-3">
-                 <Link href={`/activities/${activity.id}`} className='w-full' passHref legacyBehavior>
-                    <Button variant="outline" className="w-full border-orange-500 text-orange-500 hover:bg-orange-50 hover:text-orange-600">
-                        View Details
-                    </Button>
-                </Link>
-            </CardFooter>
-        </Card>
+            
+            {/* Registration button (replaces View Details) */}
+            {activity.registrationLink && activity.registrationLink !== '#' && (
+              <CardFooter className="border-t bg-gray-50 p-3 dark:bg-gray-800">
+                <Button 
+                  variant="outline" 
+                  className="w-full border-orange-500 text-orange-500 hover:bg-orange-50 hover:text-orange-600 dark:border-orange-400 dark:text-orange-400 dark:hover:bg-gray-700 dark:hover:text-orange-300" 
+                  asChild
+                >
+                  <Link href={activity.registrationLink} target="_blank" rel="noopener noreferrer">
+                    Register
+                  </Link>
+                </Button>
+              </CardFooter>
+            )}
+          </Card>
+        ))}
+      </div>
     );
-}
+  }
